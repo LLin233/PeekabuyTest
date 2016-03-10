@@ -89,4 +89,10 @@ public class OutfitFragment extends BaseFragment {
                 .into(target);
         mOutfitView.setProducts(event.getLook().products);
     }
+
+    public void resetOutfit() {
+        if (mOutfitView.isTapped()) {
+            mOutfitView.setTapped(false);
+        }
+    }
 }
