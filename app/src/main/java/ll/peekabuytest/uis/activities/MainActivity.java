@@ -1,20 +1,28 @@
 package ll.peekabuytest.uis.activities;
 
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import ll.peekabuytest.Constants;
 import ll.peekabuytest.R;
+import ll.peekabuytest.networks.APIEndpoint;
+import ll.peekabuytest.uis.fragments.OutfitFragment;
 
-/**
- * "x_0": 0.06896551724137931
- * "x_1": 0.4827586206896552
- * "y_1": 0.6661631419939577
- * "y_0": 0.3338368580060423
- */
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+    }
+
+    @OnClick(R.id.btn)
+    void refreshContent() {
+        OutfitFragment fragment = (OutfitFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_outfit);
+        fragment.resetOutfit();
+        APIEndpoint.requestUserOutfit(Constants.TEST_USERNAME);
     }
 }
