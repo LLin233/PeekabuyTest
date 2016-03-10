@@ -13,8 +13,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import ll.peekabuytest.Constants;
 import ll.peekabuytest.OutfitImageView;
 import ll.peekabuytest.R;
 import ll.peekabuytest.models.OutfitLoadingEvent;
@@ -54,8 +58,8 @@ public class OutfitFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext = this.getActivity().getApplicationContext();
-        APIEndpoint.requestUserOutfit("xi-liu1");
+        mContext = getContext();
+        APIEndpoint.requestUserOutfit(Constants.TEST_USERNAME);
     }
 
     @Override
@@ -73,7 +77,8 @@ public class OutfitFragment extends BaseFragment {
         mOutfitView.setOnTouchListener(mOutfitView);
     }
 
-    public void onEvent(OutfitLoadingEvent event) {
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void onOutfitLoadingEvent(OutfitLoadingEvent event) {
         if (mProgressBar.isIndeterminate()) {
             mOutfitView.setVisibility(View.VISIBLE);
             mProgressBar.setVisibility(View.GONE);

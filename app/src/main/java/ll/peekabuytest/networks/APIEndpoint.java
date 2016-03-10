@@ -1,12 +1,21 @@
 package ll.peekabuytest.networks;
 
+import android.util.Log;
+
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.List;
+
 import ll.peekabuytest.Constants;
+import ll.peekabuytest.models.Look;
 import ll.peekabuytest.models.Looks;
 import ll.peekabuytest.models.OutfitLoadingEvent;
+import ll.peekabuytest.models.Product;
+import ll.peekabuytest.models.Products;
+import ll.peekabuytest.models.ProductsLoadingEvent;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
@@ -46,18 +55,44 @@ public final class APIEndpoint {
 
     public static void requestUserOutfit(String username) {
         mAPIService.getLooks(username)
-                    .enqueue(new Callback<Looks>() {
-                        @Override
-                        public void onResponse(Response<Looks> response, Retrofit retrofit) {
-                            if (response.isSuccess()) {
-                                EventBus.getDefault().post(new OutfitLoadingEvent(response.body().getLooks().get(0)));
+                .enqueue(new Callback<Looks>() {
+                    @Override
+                    public void onResponse(Response<Looks> response, Retrofit retrofit) {
+                        if (response.isSuccess()) {
+                            List<Look> lookList = response.body().getLooks();
+                            if (!lookList.isEmpty()) {
+                                EventBus.getDefault().post(new OutfitLoadingEvent(lookList.get(0)));
+                            } else {
+                                //TODO handle empty response
                             }
                         }
-                        @Override
-                        public void onFailure(Throwable t) {
-                            t.printStackTrace();
-                        }
-                    });
+                    }
+                    @Override
+                    public void onFailure(Throwable t) {
+                        t.printStackTrace();
+                    }
+                });
     }
+
+    public static void requestSimilarProducts(String username, String productId, final Product originalItem) {
+        mAPIService.getSimilarProducts(username, productId)
+                .enqueue(new Callback<Products>() {
+                    @Override
+                    public void onResponse(Response<Products> response, Retrofit retrofit) {
+                        if (response.isSuccess()) {
+                            List<Product> list = response.body().getProducts();
+                            list.add(0, originalItem);
+                            Log.v("Products", list.toString());
+                            EventBus.getDefault().postSticky(new ProductsLoadingEvent(list));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+
+                    }
+                });
+    }
+
 
 }
