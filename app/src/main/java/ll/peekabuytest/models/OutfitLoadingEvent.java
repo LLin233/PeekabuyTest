@@ -9,7 +9,6 @@ public class OutfitLoadingEvent {
     public OutfitLoadingEvent(Look loadedLook) {
         this.mLook = loadedLook;
     }
-
     public Look getLook() {
         return mLook;
     }

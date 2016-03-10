@@ -22,6 +22,7 @@ public class InspirationLook {
         return "InspirationLook{" +
                 "id='" + id + '\'' +
                 ", Creater: " + creator.name + "\'" +
+                ", photo: " + creator.avatar_url + "\'" +
                 ", image_url='" + image_url + '\'' +
                 '}';
     }
