@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import ll.peekabuytest.models.Product;
+import ll.peekabuytest.networks.APIEndpoint;
 
 /**
  * Created by Le on 2016/3/7.
@@ -209,9 +210,18 @@ import ll.peekabuytest.models.Product;
  */
 public class OutfitImageView extends ImageView implements View.OnTouchListener {
     //float[] xy = {0.06896551724137931f,0.3338368580060423f, 0.4827586206896552f, 0.6661631419939577f};
-    float[] xy = {0.06896551724137931f, 0.6411042944785276f, 0.4827586206896552f, 0.9386503067484663f};
-    boolean isTapped = false;
+    private float[] xy = new float[4];
+
+
+    private boolean isTapped = false;
     Product selectedPruduct;
+
+    public void setTapped(boolean tapped) {
+        isTapped = tapped;
+    }
+    public boolean isTapped() {
+        return isTapped;
+    }
 
     private List<Product> mProducts = Collections.emptyList();
 
@@ -245,9 +255,9 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
             int height = this.getHeight();
             Log.d("Window", height + "  " + height);
             Paint paint = new Paint();
-            paint.setColor(Color.RED);
+            paint.setColor(Color.MAGENTA);
             paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(10);
+            paint.setStrokeWidth(5);
 
             float leftx = width * xy[0];
             float topy = height * xy[1];
@@ -264,12 +274,6 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
         int width = this.getWidth();
         int height = this.getHeight();
 
-        float leftx = width * xy[0];
-        float topy = height * xy[1];
-        float rightx = width * xy[2];
-        float bottomy = height * xy[3];
-
-
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (Product item : mProducts) {
                 float[] xyz = item.getCoordinates();
@@ -279,6 +283,7 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
                         selectedPruduct = null;
                     } else {
                         selectedPruduct = item;
+                        APIEndpoint.requestSimilarProducts(Constants.TEST_USERNAME, this.selectedPruduct.id, this.selectedPruduct);
                         isTapped = true;
                         xy = xyz;
                         Log.v("OutfitImageView", "Selected Item :" + selectedPruduct.toString());
