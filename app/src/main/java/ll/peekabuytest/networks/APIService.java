@@ -3,6 +3,7 @@ package ll.peekabuytest.networks;
 import com.google.gson.JsonElement;
 
 import ll.peekabuytest.models.Looks;
+import ll.peekabuytest.models.Products;
 import retrofit.Call;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -20,5 +21,5 @@ public interface APIService {
 
     //https://test.flaunt.peekabuy.com/api/look/get_similar_products/?username=xi-liu1&product_id=234
     @GET("get_similar_products/")
-    Call<JsonElement> getSimilarProducts(@Query("username") String username, @Query("product_id") String id);
+    Call<Products> getSimilarProducts(@Query("username") String username, @Query("product_id") String id);
 }

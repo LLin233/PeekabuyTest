@@ -10,6 +10,7 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 
 import ll.peekabuytest.Constants;
+import ll.peekabuytest.models.InspirationLoadingEvent;
 import ll.peekabuytest.models.Look;
 import ll.peekabuytest.models.Looks;
 import ll.peekabuytest.models.OutfitLoadingEvent;
@@ -61,12 +62,14 @@ public final class APIEndpoint {
                         if (response.isSuccess()) {
                             List<Look> lookList = response.body().getLooks();
                             if (!lookList.isEmpty()) {
-                                EventBus.getDefault().post(new OutfitLoadingEvent(lookList.get(0)));
+                                EventBus.getDefault().postSticky(new InspirationLoadingEvent(lookList.get(0).inspiration_looks));
+                                EventBus.getDefault().postSticky(new OutfitLoadingEvent(lookList.get(0)));
                             } else {
                                 //TODO handle empty response
                             }
                         }
                     }
+
                     @Override
                     public void onFailure(Throwable t) {
                         t.printStackTrace();
