@@ -9,8 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -23,6 +25,7 @@ import ll.peekabuytest.R;
 import ll.peekabuytest.adapters.ProductAdapter;
 import ll.peekabuytest.models.Product;
 import ll.peekabuytest.models.ProductsLoadingEvent;
+import ll.peekabuytest.uis.activities.MainActivity;
 
 /**
  * Created by Le on 2016/3/8.
@@ -55,8 +58,13 @@ public class ProductFragment extends BaseFragment {
         linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mAdapter = new ProductAdapter(this.getActivity());
+        mAdapter.setOnItemClickLitener(new ProductAdapter.OnItemClickLitener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                exhibitProduct(mAdapter.getDatas().get(position));
+            }
+        });
         mRecyclerView.setAdapter(mAdapter);
-
     }
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
@@ -70,6 +78,7 @@ public class ProductFragment extends BaseFragment {
     private void exhibitProduct(Product item) {
         Glide.with(getContext())
                 .load(item.image_url)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(mCurrentItemImage);
         mTextViewPrice.setText(item.price);
         mTextViewdescription.setText(item.description);

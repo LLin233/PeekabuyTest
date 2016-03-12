@@ -21,12 +21,25 @@ import ll.peekabuytest.models.Product;
 /**
  * Created by Le on 2016/3/8.
  */
-public class ProductAdapter extends
-        RecyclerView.Adapter<ProductAdapter.ViewHolder> {
+public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
     private LayoutInflater mInflater;
     private List<Product> mDatas;
     private Context mContext;
+    private OnItemClickLitener mOnItemClickLitener;
+
+    public interface OnItemClickLitener {
+        void onItemClick(View view, int position);
+    }
+
+    public void setOnItemClickLitener(OnItemClickLitener mOnItemClickLitener) {
+        this.mOnItemClickLitener = mOnItemClickLitener;
+    }
+
+
+    public List<Product> getDatas() {
+        return mDatas;
+    }
 
     public ProductAdapter(Context context) {
         mContext = context;
@@ -69,6 +82,17 @@ public class ProductAdapter extends
                 .load(mDatas.get(i).image_url)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(viewHolder.mImageView);
+
+        if (mOnItemClickLitener != null) {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mOnItemClickLitener.onItemClick(viewHolder.itemView, i);
+                }
+            });
+
+        }
+
     }
 
     @Override
@@ -76,6 +100,7 @@ public class ProductAdapter extends
         super.onViewRecycled(holder);
         Glide.clear(holder.mImageView);
     }
+
 
 }
 
