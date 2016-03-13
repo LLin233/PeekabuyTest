@@ -13,16 +13,22 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
+import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.concurrent.ExecutionException;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import ll.peekabuytest.Constants;
-import ll.peekabuytest.OutfitImageView;
 import ll.peekabuytest.R;
-import ll.peekabuytest.models.OutfitLoadingEvent;
+import ll.peekabuytest.models.events.OutfitItemChangeEvent;
+import ll.peekabuytest.models.events.OutfitLoadingEvent;
+import ll.peekabuytest.models.events.ProductReadyToTryOnEvent;
+import ll.peekabuytest.models.events.SelectedItemSizeChangedEvent;
 import ll.peekabuytest.networks.APIEndpoint;
+import ll.peekabuytest.widgets.OutfitImageView;
 
 public class OutfitFragment extends BaseFragment {
 
@@ -30,6 +36,12 @@ public class OutfitFragment extends BaseFragment {
     OutfitImageView mOutfitView;
     @Bind(R.id.fragment_outfit_loadingProgressBar)
     ProgressBar mProgressBar;
+
+    private int selectedItemImageWidth;
+    private int selectedItemImageHeight;
+
+    private Bitmap itemBitmap = null;
+
 
     private Context mContext;
     private SimpleTarget target = new SimpleTarget<Bitmap>() {
@@ -90,9 +102,46 @@ public class OutfitFragment extends BaseFragment {
         mOutfitView.setProducts(event.getLook().products);
     }
 
+    @Subscribe(sticky = true, threadMode = ThreadMode.BACKGROUND)
+    public void onOutfitItemChangeEvent(OutfitItemChangeEvent event) {
+        try {
+            Bitmap itemImage = Glide.with(getActivity())
+                    .load(event.getProductTryOn().image_url)
+                    .asBitmap()
+                    .into(selectedItemImageWidth, selectedItemImageHeight)
+                    .get();
+            itemBitmap = itemImage;
+            EventBus.getDefault().postSticky(new ProductReadyToTryOnEvent());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
+    public void handleProductTryOnEvent(ProductReadyToTryOnEvent event) {
+        mOutfitView.setItemBitmap(this.itemBitmap);
+    }
+
+    @Subscribe
+    public void handleProductDisplayAreaChangedEvent(SelectedItemSizeChangedEvent event) {
+        this.selectedItemImageHeight = event.getNewHeight();
+        this.selectedItemImageWidth = event.getNewWidth();
+    }
+
     public void resetOutfit() {
         if (mOutfitView.isTapped()) {
             mOutfitView.setTapped(false);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (itemBitmap != null) {
+            itemBitmap.recycle();
+            itemBitmap = null;
+        }
+        super.onDestroyView();
     }
 }
