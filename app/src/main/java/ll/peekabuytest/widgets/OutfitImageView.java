@@ -1,8 +1,10 @@
-package ll.peekabuytest;
+package ll.peekabuytest.widgets;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -10,10 +12,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import ll.peekabuytest.Constants;
 import ll.peekabuytest.models.Product;
+import ll.peekabuytest.models.events.FragmentChangeEvent;
+import ll.peekabuytest.models.events.SelectedItemSizeChangedEvent;
 import ll.peekabuytest.networks.APIEndpoint;
 
 /**
@@ -210,15 +218,15 @@ import ll.peekabuytest.networks.APIEndpoint;
  */
 public class OutfitImageView extends ImageView implements View.OnTouchListener {
     //float[] xy = {0.06896551724137931f,0.3338368580060423f, 0.4827586206896552f, 0.6661631419939577f};
-    private float[] xy = new float[4];
-
-
+    private float[] coordinates = new float[4];
     private boolean isTapped = false;
-    Product selectedPruduct;
+    private Product selectedPruduct;
+    private Bitmap mItemBitmap = null;
 
     public void setTapped(boolean tapped) {
         isTapped = tapped;
     }
+
     public boolean isTapped() {
         return isTapped;
     }
@@ -251,19 +259,16 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         if (isTapped) {
-            int width = this.getWidth();
-            int height = this.getHeight();
-            Log.d("Window", height + "  " + height);
+            float[] xy = getRect();
             Paint paint = new Paint();
             paint.setColor(Color.MAGENTA);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(5);
+            canvas.drawRect(xy[0], xy[1], xy[2], xy[3], paint);
 
-            float leftx = width * xy[0];
-            float topy = height * xy[1];
-            float rightx = width * xy[2];
-            float bottomy = height * xy[3];
-            canvas.drawRect(leftx, topy, rightx, bottomy, paint);
+            if (selectedPruduct != null && mItemBitmap != null) {
+                canvas.drawBitmap(scale(mItemBitmap, xy[2] - xy[0], xy[3] - xy[1]), xy[0], xy[1], null);
+            }
         } else {
             canvas.restore();
         }
@@ -273,28 +278,43 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
     public boolean onTouch(View v, MotionEvent event) {
         int width = this.getWidth();
         int height = this.getHeight();
-
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
             for (Product item : mProducts) {
                 float[] xyz = item.getCoordinates();
                 if (event.getX() > width * xyz[0] && event.getX() < width * xyz[2] && event.getY() > height * xyz[1] && event.getY() < height * xyz[3]) {
                     if (item.equals(selectedPruduct)) {
-                        isTapped = !isTapped;
+                        isTapped = false;
                         selectedPruduct = null;
+                        EventBus.getDefault().postSticky(new FragmentChangeEvent(false));
+                        Log.v("OutfitImageView", "isTapped :" + isTapped);
+                        invalidate();
                     } else {
                         selectedPruduct = item;
+                        if (mItemBitmap != null) {
+                            mItemBitmap.recycle();
+                            mItemBitmap = null;
+                        }
+                        EventBus.getDefault().postSticky(new FragmentChangeEvent(true));
                         APIEndpoint.requestSimilarProducts(Constants.TEST_USERNAME, this.selectedPruduct.id, this.selectedPruduct);
                         isTapped = true;
-                        xy = xyz;
+                        if (!Arrays.equals(xyz, coordinates)) {
+                            coordinates = xyz;
+                            float[] newRect = getRect();
+                            EventBus.getDefault().post(new SelectedItemSizeChangedEvent(newRect[2] - newRect[0], newRect[3] - newRect[1]));
+                        }
                         Log.v("OutfitImageView", "Selected Item :" + selectedPruduct.toString());
                     }
-
                     invalidate();
                     break;
+                } else {
+                    if (isTapped) {
+                        isTapped = false;
+                        EventBus.getDefault().postSticky(new FragmentChangeEvent(false));
+                        invalidate();
+                    }
                 }
             }
             Log.v("window", "tapped," + event.getX() + " " + event.getY() + "item selected: " + isTapped);
-
         }
         return true;
     }
@@ -307,4 +327,29 @@ public class OutfitImageView extends ImageView implements View.OnTouchListener {
         }
     }
 
+    private Bitmap scale(Bitmap src, float newWidth, float newHeight) {
+        float width = src.getWidth();
+        float height = src.getHeight();
+        Matrix matrix = new Matrix();
+        float scaleWidth = newWidth / width;
+        float scaleHeight = newHeight / height;
+        matrix.postScale(scaleWidth, scaleHeight);
+        return Bitmap.createBitmap(src, 0, 0, (int) width, (int) height,
+                matrix, true);
+    }
+
+    public float[] getRect() {
+        int width = this.getWidth();
+        int height = this.getHeight();
+        float leftx = width * coordinates[0];
+        float topy = height * coordinates[1];
+        float rightx = width * coordinates[2];
+        float bottomy = height * coordinates[3];
+        return new float[]{leftx, topy, rightx, bottomy};
+    }
+
+    public void setItemBitmap(Bitmap itemBitmap) {
+        this.mItemBitmap = itemBitmap;
+        invalidate();
+    }
 }
