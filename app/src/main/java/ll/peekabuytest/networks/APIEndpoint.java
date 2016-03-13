@@ -10,13 +10,13 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.List;
 
 import ll.peekabuytest.Constants;
-import ll.peekabuytest.models.InspirationLoadingEvent;
+import ll.peekabuytest.models.events.InspirationLoadingEvent;
 import ll.peekabuytest.models.Look;
 import ll.peekabuytest.models.Looks;
-import ll.peekabuytest.models.OutfitLoadingEvent;
+import ll.peekabuytest.models.events.OutfitLoadingEvent;
 import ll.peekabuytest.models.Product;
 import ll.peekabuytest.models.Products;
-import ll.peekabuytest.models.ProductsLoadingEvent;
+import ll.peekabuytest.models.events.ProductsLoadingEvent;
 import retrofit.Callback;
 import retrofit.GsonConverterFactory;
 import retrofit.Response;
