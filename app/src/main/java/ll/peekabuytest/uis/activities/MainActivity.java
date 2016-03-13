@@ -11,7 +11,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ll.peekabuytest.Constants;
 import ll.peekabuytest.R;
-import ll.peekabuytest.models.FragmentChangeEvent;
+import ll.peekabuytest.models.events.FragmentChangeEvent;
 import ll.peekabuytest.networks.APIEndpoint;
 import ll.peekabuytest.uis.fragments.InspirationFragment;
 import ll.peekabuytest.uis.fragments.OutfitFragment;
@@ -41,6 +41,10 @@ public class MainActivity extends AppCompatActivity {
     void refreshContent() {
         if (mOutfitFragment != null) {
             mOutfitFragment.resetOutfit();
+        }
+        FragmentTransaction tx = getSupportFragmentManager().beginTransaction();
+        if (mProductFragment != null && mProductFragment.isVisible()) {
+            tx.hide(mProductFragment).show(mInspirationFragment).commit();
         }
         APIEndpoint.requestUserOutfit(Constants.TEST_USERNAME);
     }
