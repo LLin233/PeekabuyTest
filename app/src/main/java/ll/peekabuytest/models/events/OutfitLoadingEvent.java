@@ -1,4 +1,6 @@
-package ll.peekabuytest.models;
+package ll.peekabuytest.models.events;
+
+import ll.peekabuytest.models.Look;
 
 /**
  * Created by Le on 2016/3/8.

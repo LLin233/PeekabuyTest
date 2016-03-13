@@ -1,6 +1,8 @@
-package ll.peekabuytest.models;
+package ll.peekabuytest.models.events;
 
 import java.util.List;
+
+import ll.peekabuytest.models.Product;
 
 /**
  * Created by Le on 2016/3/9.
