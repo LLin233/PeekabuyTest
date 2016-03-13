@@ -4,13 +4,45 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".uis.activities.MainActivity">
 
+    <Button
+        android:id="@+id/btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="refresh"/>
+
     <fragment
-        android:name="ll.peekabuytest.uis.fragments.OutfitFragment"
         android:id="@+id/fragment_outfit"
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
+        android:name="ll.peekabuytest.uis.fragments.OutfitFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="1"
         tools:layout="@layout/fragment_outfit"/>
+
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+    </FrameLayout>
+
+    <!--<fragment-->
+        <!--android:id="@+id/fragment_product"-->
+        <!--android:name="ll.peekabuytest.uis.fragments.ProductFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--tools:layout="@layout/fragment_product"/>-->
+    <!--<fragment-->
+        <!--android:id="@+id/fragment_inspiration"-->
+        <!--android:name="ll.peekabuytest.uis.fragments.InspirationFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="0dp"-->
+        <!--android:layout_weight="1"-->
+        <!--tools:layout="@layout/fragment_inspiration"/>-->
+
+
+
 </LinearLayout>

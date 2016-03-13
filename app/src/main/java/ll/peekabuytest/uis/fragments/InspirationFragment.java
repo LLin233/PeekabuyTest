@@ -2,7 +2,6 @@ package ll.peekabuytest.uis.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.Log;
@@ -19,9 +18,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import ll.peekabuytest.R;
 import ll.peekabuytest.adapters.InspirationLookAdapter;
-import ll.peekabuytest.models.InspirationLoadingEvent;
+import ll.peekabuytest.models.events.InspirationLoadingEvent;
 import ll.peekabuytest.models.InspirationLook;
-import ll.peekabuytest.models.Look;
 
 /**
  * Created by Le on 2016/3/9.
@@ -45,9 +43,6 @@ public class InspirationFragment extends BaseFragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this.getActivity());
-//        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-//        mRecyclerView.setLayoutManager(linearLayoutManager);
         StaggeredGridLayoutManager gridLayoutManager =
                 new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         gridLayoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
@@ -63,4 +58,6 @@ public class InspirationFragment extends BaseFragment {
         Log.v("Event", mInspirationLookList.toString());
         mAdapter.setDatas(mInspirationLookList);
     }
+
+
 }
